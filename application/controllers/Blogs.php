@@ -112,11 +112,36 @@ class Blogs extends CI_Controller {
 			$post = $this->db->get('posts')->row();
             $view_data['head_page'] = $post->judul;
             $view_data['post'] = $post;
+			$this->db->where("id_post", $id);
+			$this->db->order_by("tgl_comment", "DESC");
+            $view_data['comments'] = $this->db->get('comments')->result();
+
+			if($this->input->post("add_comment")){
+				$idp = $this->input->post("id");
+				$nama = $this->input->post("nama_comment");
+				$comment = $this->input->post("comment");
+
+				$data = array(
+					'id_post' => $idp,
+					'nama' => $nama,
+					'comment' => $comment,
+					'tgl_comment' => date('Y-m-d H:i:s'),
+				);
+				$this->db->insert('comments', $data);
+				// $this->session->set_flashdata('success', "Post berhasil ditambahkan!");
+				redirect("blogs?act=post&id=$idp#comments");
+			}
         }elseif($act == "delete" && !empty($id)){
 			$this->db->where("id_post", $id);
 			$this->db->delete('posts');
 			$this->session->set_flashdata('success', "Post berhasil dihapus!");
 			redirect("blogs?act=list");
+        }elseif($act == "delcomment" && !empty($id)){
+        	$idp = $this->input->get('post');
+			$this->db->where("id_comment", $id);
+			$this->db->delete('comments');
+			$this->session->set_flashdata('success', "Komentar berhasil dihapus!");
+			redirect("blogs?act=post&id=$idp#comments");
         }else{
             $view_data['body_page'] = "beranda.php";
         }

@@ -5,4 +5,9 @@
  * 
  */
 
-"use strict";
+$('#add_comment').on('submit', function(e) {
+    if($('#comment_content').summernote('isEmpty')) {
+        alert('Isi komentar kosong!');
+        e.preventDefault();
+    }
+})
